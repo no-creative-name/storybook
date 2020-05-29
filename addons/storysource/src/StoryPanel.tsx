@@ -11,6 +11,7 @@ import {
   SyntaxHighlighterRendererProps,
   createSyntaxHighlighterElement,
 } from '@storybook/components';
+import { STORY_RENDERED } from '@storybook/core-events';
 
 import { SourceBlock, LocationsMap } from '@storybook/source-loader';
 import { Story } from '@storybook/api/dist/lib/stories';
@@ -58,31 +59,33 @@ export const StoryPanel: React.FC<StoryPanelProps> = ({ api }) => {
   const story: Story | undefined = api.getCurrentStoryData() as Story;
   const selectedStoryRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
-    if (story) {
-      const compiledSource = (window.document.querySelector(
-        '#storybook-preview-iframe'
-      ) as any)?.contentDocument.querySelector('#root')
-        ? (window.document.querySelector(
-            '#storybook-preview-iframe'
-          ) as any)?.contentDocument.querySelector('#root').innerHTML
-        : '';
-      const {
-        parameters: {
-          // @ts-ignore
-          storySource: { locationsMap } = { source: '', locationsMap: {} },
-        } = {},
-      } = story;
-      const currentLocation = locationsMap
-        ? locationsMap[
-            Object.keys(locationsMap).find((key: string) => {
-              const sourceLoaderId = key.split('--');
-              return story.id.endsWith(sourceLoaderId[sourceLoaderId.length - 1]);
-            })
-          ]
-        : undefined;
-      setState({ source: compiledSource, locationsMap, currentLocation });
-    }
-  }, [story ? story.id : null]);
+    api.on(STORY_RENDERED, () => {
+      if (story) {
+        const compiledSource = (window.document.querySelector(
+          '#storybook-preview-iframe'
+        ) as any)?.contentDocument.querySelector('#root')
+          ? (window.document.querySelector(
+              '#storybook-preview-iframe'
+            ) as any)?.contentDocument.querySelector('#root').innerHTML
+          : '';
+        const {
+          parameters: {
+            // @ts-ignore
+            storySource: { locationsMap } = { source: '', locationsMap: {} },
+          } = {},
+        } = story;
+        const currentLocation = locationsMap
+          ? locationsMap[
+              Object.keys(locationsMap).find((key: string) => {
+                const sourceLoaderId = key.split('--');
+                return story.id.endsWith(sourceLoaderId[sourceLoaderId.length - 1]);
+              })
+            ]
+          : undefined;
+        setState({ source: compiledSource, locationsMap, currentLocation });
+      }
+    });
+  }, []);
   React.useEffect(() => {
     if (selectedStoryRef.current) {
       selectedStoryRef.current.scrollIntoView();

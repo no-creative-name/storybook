@@ -61,6 +61,8 @@ var _router = require("@storybook/router");
 
 var _components = require("@storybook/components");
 
+var _coreEvents = require("@storybook/core-events");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
@@ -127,31 +129,33 @@ var StoryPanel = function StoryPanel(_ref4) {
   var selectedStoryRef = _react["default"].useRef(null);
 
   _react["default"].useEffect(function () {
-    if (story) {
-      var _ref5, _ref6;
+    api.on(_coreEvents.STORY_RENDERED, function () {
+      if (story) {
+        var _ref5, _ref6;
 
-      var compiledSource = ((_ref5 = window.document.querySelector('#storybook-preview-iframe')) === null || _ref5 === void 0 ? void 0 : _ref5.contentDocument.querySelector('#root')) ? (_ref6 = window.document.querySelector('#storybook-preview-iframe')) === null || _ref6 === void 0 ? void 0 : _ref6.contentDocument.querySelector('#root').innerHTML : '';
-      var _story$parameters = story.parameters;
-      _story$parameters = _story$parameters === void 0 ? {} : _story$parameters;
-      var _story$parameters$sto = _story$parameters.storySource;
-      _story$parameters$sto = _story$parameters$sto === void 0 ? {
-        source: '',
-        locationsMap: {}
-      } : _story$parameters$sto;
-      var _locationsMap = _story$parameters$sto.locationsMap;
+        var compiledSource = ((_ref5 = window.document.querySelector('#storybook-preview-iframe')) === null || _ref5 === void 0 ? void 0 : _ref5.contentDocument.querySelector('#root')) ? (_ref6 = window.document.querySelector('#storybook-preview-iframe')) === null || _ref6 === void 0 ? void 0 : _ref6.contentDocument.querySelector('#root').innerHTML : '';
+        var _story$parameters = story.parameters;
+        _story$parameters = _story$parameters === void 0 ? {} : _story$parameters;
+        var _story$parameters$sto = _story$parameters.storySource;
+        _story$parameters$sto = _story$parameters$sto === void 0 ? {
+          source: '',
+          locationsMap: {}
+        } : _story$parameters$sto;
+        var _locationsMap = _story$parameters$sto.locationsMap;
 
-      var _currentLocation = _locationsMap ? _locationsMap[Object.keys(_locationsMap).find(function (key) {
-        var sourceLoaderId = key.split('--');
-        return story.id.endsWith(sourceLoaderId[sourceLoaderId.length - 1]);
-      })] : undefined;
+        var _currentLocation = _locationsMap ? _locationsMap[Object.keys(_locationsMap).find(function (key) {
+          var sourceLoaderId = key.split('--');
+          return story.id.endsWith(sourceLoaderId[sourceLoaderId.length - 1]);
+        })] : undefined;
 
-      setState({
-        source: compiledSource,
-        locationsMap: _locationsMap,
-        currentLocation: _currentLocation
-      });
-    }
-  }, [story ? story.id : null]);
+        setState({
+          source: compiledSource,
+          locationsMap: _locationsMap,
+          currentLocation: _currentLocation
+        });
+      }
+    });
+  }, []);
 
   _react["default"].useEffect(function () {
     if (selectedStoryRef.current) {
