@@ -128,34 +128,39 @@ var StoryPanel = function StoryPanel(_ref4) {
 
   var selectedStoryRef = _react["default"].useRef(null);
 
+  var setStoryState = function setStoryState() {
+    if (story && window.document.querySelector('#storybook-preview-iframe')) {
+      var _ref5, _ref6;
+
+      var compiledSource = ((_ref5 = window.document.querySelector('#storybook-preview-iframe')) === null || _ref5 === void 0 ? void 0 : _ref5.contentDocument.querySelector('#root')) ? (_ref6 = window.document.querySelector('#storybook-preview-iframe')) === null || _ref6 === void 0 ? void 0 : _ref6.contentDocument.querySelector('#root').innerHTML : '';
+      var _story$parameters = story.parameters;
+      _story$parameters = _story$parameters === void 0 ? {} : _story$parameters;
+      var _story$parameters$sto = _story$parameters.storySource;
+      _story$parameters$sto = _story$parameters$sto === void 0 ? {
+        locationsMap: {}
+      } : _story$parameters$sto;
+      var _locationsMap = _story$parameters$sto.locationsMap;
+
+      var _currentLocation = _locationsMap ? _locationsMap[Object.keys(_locationsMap).find(function (key) {
+        var sourceLoaderId = key.split('--');
+        return story.id.endsWith(sourceLoaderId[sourceLoaderId.length - 1]);
+      })] : undefined;
+
+      setState({
+        source: compiledSource,
+        locationsMap: _locationsMap,
+        currentLocation: _currentLocation
+      });
+    }
+  };
+
   _react["default"].useEffect(function () {
-    api.on(_coreEvents.STORY_RENDERED, function () {
-      if (story) {
-        var _ref5, _ref6;
-
-        var compiledSource = ((_ref5 = window.document.querySelector('#storybook-preview-iframe')) === null || _ref5 === void 0 ? void 0 : _ref5.contentDocument.querySelector('#root')) ? (_ref6 = window.document.querySelector('#storybook-preview-iframe')) === null || _ref6 === void 0 ? void 0 : _ref6.contentDocument.querySelector('#root').innerHTML : '';
-        var _story$parameters = story.parameters;
-        _story$parameters = _story$parameters === void 0 ? {} : _story$parameters;
-        var _story$parameters$sto = _story$parameters.storySource;
-        _story$parameters$sto = _story$parameters$sto === void 0 ? {
-          source: '',
-          locationsMap: {}
-        } : _story$parameters$sto;
-        var _locationsMap = _story$parameters$sto.locationsMap;
-
-        var _currentLocation = _locationsMap ? _locationsMap[Object.keys(_locationsMap).find(function (key) {
-          var sourceLoaderId = key.split('--');
-          return story.id.endsWith(sourceLoaderId[sourceLoaderId.length - 1]);
-        })] : undefined;
-
-        setState({
-          source: compiledSource,
-          locationsMap: _locationsMap,
-          currentLocation: _currentLocation
-        });
-      }
-    });
+    return setStoryState;
   }, []);
+
+  api.on(_coreEvents.STORY_RENDERED, function () {
+    return setStoryState;
+  });
 
   _react["default"].useEffect(function () {
     if (selectedStoryRef.current) {
