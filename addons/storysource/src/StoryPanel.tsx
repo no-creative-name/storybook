@@ -1,3 +1,6 @@
+/* jslint browser: true */
+/* global window */
+
 import React from 'react';
 import { API } from '@storybook/api';
 import { styled } from '@storybook/theming';
@@ -56,7 +59,13 @@ export const StoryPanel: React.FC<StoryPanelProps> = ({ api }) => {
   const selectedStoryRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     if (story) {
-      const compiledSource = (document.querySelector('#storybook-preview-iframe') as any)?.contentDocument.querySelector('#root') ? (document.querySelector('#storybook-preview-iframe') as any)?.contentDocument.querySelector('#root').innerHTML : '';
+      const compiledSource = (window.document.querySelector(
+        '#storybook-preview-iframe'
+      ) as any)?.contentDocument.querySelector('#root')
+        ? (window.document.querySelector(
+            '#storybook-preview-iframe'
+          ) as any)?.contentDocument.querySelector('#root').innerHTML
+        : '';
       const {
         parameters: {
           // @ts-ignore
@@ -71,7 +80,7 @@ export const StoryPanel: React.FC<StoryPanelProps> = ({ api }) => {
             })
           ]
         : undefined;
-      setState({ compiledSource, locationsMap, currentLocation });
+      setState({ source: compiledSource, locationsMap, currentLocation });
     }
   }, [story ? story.id : null]);
   React.useEffect(() => {
