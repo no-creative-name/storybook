@@ -56,10 +56,11 @@ export const StoryPanel: React.FC<StoryPanelProps> = ({ api }) => {
   const selectedStoryRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => {
     if (story) {
+      const compiledSource = (document.querySelector('#storybook-preview-iframe') as any)?.contentDocument.querySelector('#root') ? (document.querySelector('#storybook-preview-iframe') as any)?.contentDocument.querySelector('#root').innerHTML : '';
       const {
         parameters: {
           // @ts-ignore
-          storySource: { source, locationsMap } = { source: '', locationsMap: {} },
+          storySource: { locationsMap } = { source: '', locationsMap: {} },
         } = {},
       } = story;
       const currentLocation = locationsMap
@@ -70,7 +71,7 @@ export const StoryPanel: React.FC<StoryPanelProps> = ({ api }) => {
             })
           ]
         : undefined;
-      setState({ source, locationsMap, currentLocation });
+      setState({ compiledSource, locationsMap, currentLocation });
     }
   }, [story ? story.id : null]);
   React.useEffect(() => {
